@@ -2,13 +2,7 @@
 
 class Point {
 public:
-    Point() noexcept;
-    void setPoint(int x, int y, int group) noexcept;
-    void setGroup(int index) noexcept;
-    int getX() const noexcept;
-    int getY() const noexcept;
-    int getGroup() const noexcept;
-
-private:
-    int x, y, group;
+    Point(double enteredX, double enteredY) noexcept;
+    bool operator==(const Point& otherPoint) const noexcept;
+    const double x, y;
 };

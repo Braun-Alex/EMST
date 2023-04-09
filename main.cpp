@@ -1,6 +1,7 @@
 #include <iostream>
+#include "point.h"
 
 int main() {
-    std::cout << "AAA" << std::endl;
+    Point point(5, 3);
     return 0;
 }
