@@ -5,10 +5,6 @@ Edge::Edge() noexcept {}
 Edge::Edge(const Point& startPoint, const Point& endPoint) noexcept: start(startPoint),
 end(endPoint) {}
 
-bool Edge::operator==(const Edge& otherEdge) const noexcept {
-    return start == otherEdge.start && end == otherEdge.end;
-}
-
 bool Edge::operator==(const std::shared_ptr<Edge>& otherEdge) const noexcept {
     return start == otherEdge->start && end == otherEdge->end;
 }
