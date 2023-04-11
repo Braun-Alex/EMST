@@ -7,7 +7,10 @@ class Edge {
 public:
     Edge() noexcept;
     Edge(const Point& a, const Point& b) noexcept;
-    bool operator==(std::unique_ptr<Edge> otherEdge) const noexcept;
+    bool operator==(const std::shared_ptr<Edge>& otherEdge) const noexcept;
+    void replace(const std::shared_ptr<Edge>& otherEdge) noexcept;
     Point start, end;
-    std::unique_ptr<Edge> rev, prev, next;
+    std::shared_ptr<Edge> rev = std::make_shared<Edge>(),
+                          prev = std::make_shared<Edge>(),
+                          next = std::make_shared<Edge>();
 };
