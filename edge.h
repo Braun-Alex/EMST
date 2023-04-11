@@ -1,11 +1,13 @@
 #pragma once
 
+#include <memory>
 #include "point.h"
 
 class Edge {
 public:
+    Edge() noexcept;
     Edge(const Point& a, const Point& b) noexcept;
-    bool contains(const Point& point) const noexcept;
-    bool operator==(const Edge& otherEdge) const noexcept;
-    Point a, b;
+    bool operator==(std::unique_ptr<Edge> otherEdge) const noexcept;
+    Point start, end;
+    std::unique_ptr<Edge> rev, prev, next;
 };
