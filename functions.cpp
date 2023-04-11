@@ -26,7 +26,7 @@ bool circleContains(const Point& a, const Point& b, const Point& c, const Point&
     return matrix.determinant() < 0;
 }
 
-std::shared_ptr<Edge> addEdge(std::vector<std::shared_ptr<Edge>>& edges, const Point& startPoint,
+std::shared_ptr<Edge> addEdge(std::unordered_set<std::shared_ptr<Edge>>& edges, const Point& startPoint,
              const Point& endPoint) {
     std::shared_ptr<Edge> forwardEdge = std::make_shared<Edge>(Edge(startPoint, endPoint)),
             backEdge = std::make_shared<Edge>(Edge(endPoint, startPoint));
@@ -36,11 +36,20 @@ std::shared_ptr<Edge> addEdge(std::vector<std::shared_ptr<Edge>>& edges, const P
     forwardEdge->prev = forwardEdge;
     backEdge->next = backEdge;
     backEdge->prev = backEdge;
-    edges.push_back(forwardEdge);
+    edges.insert(forwardEdge);
     return forwardEdge;
 }
 
-std::vector<std::shared_ptr<Edge>> divideAndConquer(std::vector<std::shared_ptr<Edge>>& edges,
+std::shared_ptr<Edge> mergeEdges(std::unordered_set<std::shared_ptr<Edge>>& edges,
+                                 const std::shared_ptr<Edge>& firstEdge,
+                                 const std::shared_ptr<Edge>& secondEdge) {
+    std::shared_ptr<Edge> mergedEdge = addEdge(edges, firstEdge->end, secondEdge->start);
+    mergedEdge->connect(firstEdge->rev->prev);
+    mergedEdge->rev->connect(secondEdge);
+    return mergedEdge;
+}
+
+std::vector<std::shared_ptr<Edge>> divideAndConquer(std::unordered_set<std::shared_ptr<Edge>>& edges,
                                                     const std::vector<Point>& points) {
     size_t size = points.size();
     if (size == 2) {
@@ -59,5 +68,5 @@ std::vector<std::pair<Point, Point>> triangulateDelaunay(const std::vector<Point
     uniqueAndSortedPoints.erase(std::unique(uniqueAndSortedPoints.begin(),
                                             uniqueAndSortedPoints.end()),
                                 uniqueAndSortedPoints.end());
-    std::vector<std::shared_ptr<Edge>> edges;
+    std::unordered_set<std::shared_ptr<Edge>> edges;
 }

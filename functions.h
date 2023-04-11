@@ -4,16 +4,22 @@
 #include "edge.h"
 #include "triangle.h"
 #include <vector>
+#include <unordered_set>
 #include <algorithm>
 #include <Eigen/Dense>
+
+std::allocator<Edge> edgeAllocator;
 
 double locate(const std::shared_ptr<Edge>& edge, const Point& point);
 bool isLeft(const std::shared_ptr<Edge>& edge, const Point& point);
 bool isRight(const std::shared_ptr<Edge>& edge, const Point& point);
 bool circleContains(const Point& a, const Point& b, const Point& c, const Point& point);
-std::shared_ptr<Edge> addEdge(std::vector<std::shared_ptr<Edge>>& edges, const Point& startPoint,
+std::shared_ptr<Edge> addEdge(std::unordered_set<std::shared_ptr<Edge>>& edges, const Point& startPoint,
              const Point& endPoint);
-std::vector<std::shared_ptr<Edge>> divideAndConquer(std::vector<std::shared_ptr<Edge>>& edges,
+std::shared_ptr<Edge> mergeEdges(std::vector<std::shared_ptr<Edge>>& edges,
+                                 const std::shared_ptr<Edge>& firstEdge,
+                                 const std::shared_ptr<Edge>& secondEdge);
+std::vector<std::shared_ptr<Edge>> divideAndConquer(std::unordered_set<std::shared_ptr<Edge>>& edges,
                                                     const std::vector<Point>& points);
 std::vector<std::pair<Point, Point>> triangulateDelaunay(const std::vector<Point>& points);
 std::pair<std::vector<Point>, std::vector<Edge>> computeEMST(const std::pair<std::vector<Point>,
