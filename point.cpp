@@ -7,3 +7,7 @@ Point::Point(double enteredX, double enteredY) noexcept: x(enteredX), y(enteredY
 bool Point::operator==(const Point& otherPoint) const noexcept {
     return x == otherPoint.x && y == otherPoint.y;
 }
+
+bool Point::operator<(const Point& otherPoint) const noexcept {
+    return x == otherPoint.x ? x < otherPoint.x : y < otherPoint.y;
+}
