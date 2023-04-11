@@ -1,11 +1,11 @@
 #include "edge.h"
 
-Edge::Edge(const Point& enteredA, const Point& enteredB) noexcept: a(enteredA), b(enteredB) {}
+Edge::Edge() noexcept {}
 
-bool Edge::contains(const Point& point) const noexcept {
-    return a == point || b == point;
-}
+Edge::Edge(const Point& startPoint, const Point& endPoint) noexcept: start(startPoint),
+end(endPoint), rev(std::make_unique<Edge>()), prev(std::make_unique<Edge>()),
+next(std::make_unique<Edge>()) {}
 
-bool Edge::operator==(const Edge& otherEdge) const noexcept {
-    return (a == otherEdge.a && b == otherEdge.b) || (a == otherEdge.b && b == otherEdge.a);
+bool Edge::operator==(std::unique_ptr<Edge> otherEdge) const noexcept {
+    return start == otherEdge->start && end == otherEdge->end;
 }
