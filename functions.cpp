@@ -18,3 +18,14 @@ bool isLeft(const std::shared_ptr<Edge>& edge, const Point &point) {
 bool isRight(const std::shared_ptr<Edge>& edge, const Point& point) {
     return locate(edge, point) > 0;
 }
+
+bool circleContains(const Point& a, const Point& b, const Point& c, const Point& point) {
+    Eigen::Vector<double, 2> vectorA(a.x - point.x, a.y - point.y),
+                             vectorB(b.x - point.x, b.y - point.y),
+                             vectorC(c.x - point.x, c.y - point.y);
+    Eigen::Matrix<double, 3, 3> matrix;
+    matrix << vectorA, vectorA.squaredNorm(),
+              vectorB, vectorB.squaredNorm(),
+              vectorC, vectorC.squaredNorm();
+    return matrix.determinant() < 0;
+}
