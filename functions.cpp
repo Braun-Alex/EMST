@@ -58,7 +58,7 @@ void removeEdge(std::unordered_set<std::shared_ptr<Edge>>& edges,
     edges.erase(edge->rev);
 }
 
-std::unordered_set<std::shared_ptr<Edge>> divideAndConquer(
+std::pair<std::shared_ptr<Edge>, std::shared_ptr<Edge>> divideAndConquer(
         std::unordered_set<std::shared_ptr<Edge>>& edges,
         const std::vector<Point>& points) {
     size_t size = points.size();
@@ -80,6 +80,28 @@ std::unordered_set<std::shared_ptr<Edge>> divideAndConquer(
             return {firstEdge, secondEdge->rev};
         }
     }
+    size_t middle = size/2;
+    std::vector<Point> leftPoints(points.begin(), points.begin() + middle),
+                       rightPoints(points.begin() + middle, points.end());
+    std::pair<std::shared_ptr<Edge>, std::shared_ptr<Edge>>
+    leftEdge = divideAndConquer(edges, leftPoints),
+    rightEdge = divideAndConquer(edges, rightPoints);
+    while (true) {
+        if (isLeft(rightEdge.first, leftEdge.second->start)) {
+            rightEdge.first = rightEdge.first->rev->prev;
+        } else if (isRight(leftEdge.second, rightEdge.first->start)) {
+            leftEdge.first = leftEdge.first->rev->next;
+        } else {
+            break;
+        }
+    }
+    std::shared_ptr<Edge> baseEdge = connectEdges(edges, rightEdge.first, leftEdge.first->rev);
+    if (leftEdge.first->start == leftEdge.second->start) {
+        leftEdge.second = baseEdge;
+    }
+    if (rightEdge.first->start == rightEdge.second->start) {
+        rightEdge.second = baseEdge->rev;
+    }
 }
 
 std::vector<std::pair<Point, Point>> triangulateDelaunay(const std::vector<Point>& points) {
@@ -92,7 +114,8 @@ std::vector<std::pair<Point, Point>> triangulateDelaunay(const std::vector<Point
     uniqueAndSortedPoints.erase(std::unique(uniqueAndSortedPoints.begin(),
                                             uniqueAndSortedPoints.end()),
                                 uniqueAndSortedPoints.end());
-    std::unordered_set<std::shared_ptr<Edge>> edges = divideAndConquer(edges, points);
+    std::unordered_set<std::shared_ptr<Edge>> edges;
+    divideAndConquer(edges, points);
     std::vector<std::pair<Point, Point>> triangulatedPoints;
     triangulatedPoints.reserve(edges.size());
     for (const auto &edge: edges) {
