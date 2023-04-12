@@ -25,5 +25,8 @@ std::pair<std::shared_ptr<Edge>, std::shared_ptr<Edge>> divideAndConquer(
         std::unordered_set<std::shared_ptr<Edge>>& edges,
         const std::vector<Point>& points);
 std::vector<std::pair<Point, Point>> triangulateDelaunay(const std::vector<Point>& points);
+Point findRoot(std::unordered_map<Point, Point>& treeRoots, const Point& vertex);
+void spliceRoots(std::unordered_map<Point, Point>& treeRoots, Point& u, Point& v);
+bool isAcyclic(std::unordered_map<Point, Point>& treeRoots, const Point& u, const Point& v);
 std::vector<std::tuple<Point, Point, double>>
 computeEMST(const std::vector<std::pair<Point, Point>>& edgesWithoutWeight);
