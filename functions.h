@@ -2,6 +2,7 @@
 
 #include "point.h"
 #include "edge.h"
+#include <iostream>
 #include <vector>
 #include <unordered_set>
 #include <algorithm>
@@ -25,4 +26,4 @@ std::pair<std::shared_ptr<Edge>, std::shared_ptr<Edge>> divideAndConquer(
         const std::vector<Point>& points);
 std::vector<std::pair<Point, Point>> triangulateDelaunay(const std::vector<Point>& points);
 std::pair<std::vector<Point>, std::vector<Edge>> computeEMST(const std::pair<std::vector<Point>,
-        const std::vector<Edge>>& pointsAndEdges);
+        std::vector<Edge>>& pointsAndEdges);

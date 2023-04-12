@@ -10,10 +10,10 @@ bool Edge::operator==(const std::shared_ptr<Edge>& otherEdge) const noexcept {
 }
 
 void Edge::connect(const std::shared_ptr<Edge>& otherEdge) noexcept {
-    if (this == otherEdge.get()) {
+    if (start == otherEdge->start && end == otherEdge->end) {
         return;
     }
-    otherEdge->next->prev.reset(this);
-    this->next->prev.reset(otherEdge.get());
+    otherEdge->next->prev = shared_from_this();
+    this->next->prev = otherEdge;
     this->next.swap(otherEdge->next);
 }
