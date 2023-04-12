@@ -23,13 +23,13 @@ bool circleContains(const Point& a, const Point& b, const Point& c, const Point&
                                             (b.y - point.y) * (b.y - point.y),
               c.x - point.x, c.y - point.y, (c.x - point.x) * (c.x - point.x) +
                                             (c.y - point.y) * (c.y - point.y);
-    return matrix.determinant() >= 0;
+    return matrix.determinant() < 0;
 }
 
 std::shared_ptr<Edge> addEdge(std::unordered_set<std::shared_ptr<Edge>>& edges, const Point& startPoint,
                               const Point& endPoint) {
-    std::shared_ptr<Edge> forwardEdge = std::make_shared<Edge>(Edge(startPoint, endPoint)),
-            backEdge = std::make_shared<Edge>(Edge(endPoint, startPoint));
+    std::shared_ptr<Edge> forwardEdge = std::make_shared<Edge>(startPoint, endPoint),
+            backEdge = std::make_shared<Edge>(endPoint, startPoint);
     forwardEdge->rev = backEdge;
     backEdge->rev = forwardEdge;
     forwardEdge->next = forwardEdge;
@@ -153,12 +153,31 @@ std::vector<std::pair<Point, Point>> triangulateDelaunay(const std::vector<Point
                                 uniqueAndSortedPoints.end());
     std::unordered_set<std::shared_ptr<Edge>> edges;
     divideAndConquer(edges, points);
-    std::vector<std::pair<Point, Point>> triangulatedPoints;
-    triangulatedPoints.reserve(edges.size());
+    std::vector<std::pair<Point, Point>> delaunayTriangulation;
+    delaunayTriangulation.reserve(edges.size());
     for (const auto &edge: edges) {
-        triangulatedPoints.emplace_back(std::make_pair(edge->start, edge->end));
+        delaunayTriangulation.emplace_back(std::make_pair(edge->start, edge->end));
     }
-    return triangulatedPoints;
+    return delaunayTriangulation;
+}
+
+Point findRoot(std::unordered_map<Point, Point>& treeRoots, const Point& vertex) {
+    if (!treeRoots.contains(vertex)) {
+        return vertex;
+    }
+    return treeRoots[vertex] = findRoot(treeRoots, treeRoots[vertex]);
+}
+
+void spliceRoots(std::unordered_map<Point, Point>& treeRoots, Point& u, Point& v) {
+    u = findRoot(treeRoots, u);
+    v = findRoot(treeRoots, v);
+    if (u != v) {
+        treeRoots[u] = v;
+    }
+}
+
+bool isAcyclic(std::unordered_map<Point, Point>& treeRoots, const Point& u, const Point& v) {
+    return findRoot(treeRoots, u) != findRoot(treeRoots, v);
 }
 
 std::vector<std::tuple<Point, Point, double>>
@@ -177,4 +196,19 @@ computeEMST(const std::vector<std::pair<Point, Point>>& edgesWithoutWeight) {
                  const std::tuple<Point, Point, double>& secondEdgeWithWeight) {
         return get<2>(firstEdgeWithWeight) < get<2>(secondEdgeWithWeight);
     });
+    std::vector<std::tuple<Point, Point, double>> euclideanMinimumSpanningTree(edgesWithWeight.size());
+    std::unordered_map<Point, Point> roots;
+    for (const auto& edgeWithWeight: edgesWithWeight) {
+        Point u = get<0>(edgeWithWeight), v = get<1>(edgeWithWeight);
+        if (isAcyclic(roots, u, v)) {
+            euclideanMinimumSpanningTree.push_back(edgeWithWeight);
+            spliceRoots(roots, u, v);
+        }
+    }
+    euclideanMinimumSpanningTree.erase(std::remove_if(euclideanMinimumSpanningTree.begin(),
+                                                      euclideanMinimumSpanningTree.end(),
+                                                      [](std::tuple<Point, Point, double>& edge) {
+        return get<2>(edge) == 0;
+    }), euclideanMinimumSpanningTree.end());
+    return euclideanMinimumSpanningTree;
 }
