@@ -9,5 +9,5 @@ bool Point::operator==(const Point& otherPoint) const noexcept {
 }
 
 bool Point::operator<(const Point& otherPoint) const noexcept {
-    return x == otherPoint.x ? x < otherPoint.x : y < otherPoint.y;
+    return x == otherPoint.x ? y < otherPoint.y : x < otherPoint.x;
 }

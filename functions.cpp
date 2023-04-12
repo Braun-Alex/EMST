@@ -16,14 +16,14 @@ bool isRight(const std::shared_ptr<Edge>& edge, const Point& point) {
 }
 
 bool circleContains(const Point& a, const Point& b, const Point& c, const Point& point) {
-    Eigen::Vector<double, 2> vectorA(a.x - point.x, a.y - point.y),
-            vectorB(b.x - point.x, b.y - point.y),
-            vectorC(c.x - point.x, c.y - point.y);
     Eigen::Matrix<double, 3, 3> matrix;
-    matrix << vectorA, vectorA.squaredNorm(),
-            vectorB, vectorB.squaredNorm(),
-            vectorC, vectorC.squaredNorm();
-    return matrix.determinant() < 0;
+    matrix << a.x - point.x, a.y - point.y, (a.x - point.x) * (a.x - point.x) +
+                                            (a.y - point.y) * (a.y - point.y),
+              b.x - point.x, b.y - point.y, (b.x - point.x) * (b.x - point.x) +
+                                            (b.y - point.y) * (b.y - point.y),
+              c.x - point.x, c.y - point.y, (c.x - point.x) * (c.x - point.x) +
+                                            (c.y - point.y) * (c.y - point.y);
+    return matrix.determinant() >= 0;
 }
 
 std::shared_ptr<Edge> addEdge(std::unordered_set<std::shared_ptr<Edge>>& edges, const Point& startPoint,
@@ -90,7 +90,7 @@ std::pair<std::shared_ptr<Edge>, std::shared_ptr<Edge>> divideAndConquer(
         if (isLeft(rightEdge.first, leftEdge.second->start)) {
             rightEdge.first = rightEdge.first->rev->prev;
         } else if (isRight(leftEdge.second, rightEdge.first->start)) {
-            leftEdge.first = leftEdge.first->rev->next;
+            leftEdge.second = leftEdge.second->rev->next;
         } else {
             break;
         }
@@ -121,7 +121,7 @@ std::pair<std::shared_ptr<Edge>, std::shared_ptr<Edge>> divideAndConquer(
             }
         }
         if (isRightEdgeValid) {
-            while(circleContains(baseEdge->start, baseEdge->end,
+            while (circleContains(baseEdge->start, baseEdge->end,
                                  rightCheckingEdge->end,
                                  rightCheckingEdge->next->end) &&
                                  isRight(baseEdge, rightCheckingEdge->next->end)) {
