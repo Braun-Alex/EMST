@@ -25,5 +25,5 @@ std::pair<std::shared_ptr<Edge>, std::shared_ptr<Edge>> divideAndConquer(
         std::unordered_set<std::shared_ptr<Edge>>& edges,
         const std::vector<Point>& points);
 std::vector<std::pair<Point, Point>> triangulateDelaunay(const std::vector<Point>& points);
-std::pair<std::vector<Point>, std::vector<Edge>> computeEMST(const std::pair<std::vector<Point>,
-        std::vector<Edge>>& pointsAndEdges);
+std::vector<std::tuple<Point, Point, double>>
+computeEMST(const std::vector<std::pair<Point, Point>>& edgesWithoutWeight);

@@ -12,7 +12,7 @@ int main() {
         points.emplace_back(Point(distribution(generator), distribution(generator)));
     }
     std::vector<std::pair<Point, Point>> result = triangulateDelaunay(points);
-    for (const auto &[firstPoint, secondPoint]: result) {
+    for (const auto& [firstPoint, secondPoint]: result) {
         std::cout << "First point: (" << firstPoint.x << ", " << firstPoint.y << "), "
                   << "second point: (" << secondPoint.x << ", " << secondPoint.y << ")" << std::endl;
     }
