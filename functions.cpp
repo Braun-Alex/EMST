@@ -160,3 +160,21 @@ std::vector<std::pair<Point, Point>> triangulateDelaunay(const std::vector<Point
     }
     return triangulatedPoints;
 }
+
+std::vector<std::tuple<Point, Point, double>>
+computeEMST(const std::vector<std::pair<Point, Point>>& edgesWithoutWeight) {
+    std::vector<std::tuple<Point, Point, double>> edgesWithWeight;
+    edgesWithWeight.reserve(edgesWithoutWeight.size());
+    for (const auto& edgeWithoutWeight: edgesWithoutWeight) {
+        edgesWithWeight.emplace_back(std::make_tuple(edgeWithoutWeight.first, edgeWithoutWeight.second,
+                                  (edgeWithoutWeight.first.x - edgeWithoutWeight.first.y) *
+                                  (edgeWithoutWeight.first.x - edgeWithoutWeight.first.y) +
+                                  (edgeWithoutWeight.second.x - edgeWithoutWeight.second.y) *
+                                  (edgeWithoutWeight.second.x - edgeWithoutWeight.second.y)));
+    }
+    std::sort(edgesWithWeight.begin(), edgesWithWeight.end(),
+              [](const std::tuple<Point, Point, double>& firstEdgeWithWeight,
+                 const std::tuple<Point, Point, double>& secondEdgeWithWeight) {
+        return get<2>(firstEdgeWithWeight) < get<2>(secondEdgeWithWeight);
+    });
+}
