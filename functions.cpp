@@ -102,6 +102,43 @@ std::pair<std::shared_ptr<Edge>, std::shared_ptr<Edge>> divideAndConquer(
     if (rightEdge.first->start == rightEdge.second->start) {
         rightEdge.second = baseEdge->rev;
     }
+    while (true) {
+        std::shared_ptr<Edge> leftCheckingEdge = baseEdge->prev,
+                              rightCheckingEdge = baseEdge->rev->next;
+        bool isLeftEdgeValid = isRight(baseEdge, leftCheckingEdge->end),
+             isRightEdgeValid = isRight(baseEdge, rightCheckingEdge->end);
+        if (!isLeftEdgeValid && !isRightEdgeValid) {
+            break;
+        }
+        if (isLeftEdgeValid) {
+            while (circleContains(baseEdge->start, baseEdge->end,
+                                  leftCheckingEdge->end,
+                                  leftCheckingEdge->prev->end) &&
+                                  isRight(baseEdge, leftCheckingEdge->prev->end)) {
+                std::shared_ptr<Edge> temporaryEdge = leftCheckingEdge->prev;
+                removeEdge(edges, leftCheckingEdge);
+                leftCheckingEdge = temporaryEdge;
+            }
+        }
+        if (isRightEdgeValid) {
+            while(circleContains(baseEdge->start, baseEdge->end,
+                                 rightCheckingEdge->end,
+                                 rightCheckingEdge->next->end) &&
+                                 isRight(baseEdge, rightCheckingEdge->next->end)) {
+                std::shared_ptr<Edge> temporaryEdge = rightCheckingEdge->next;
+                removeEdge(edges, rightCheckingEdge);
+                rightCheckingEdge = temporaryEdge;
+            }
+        }
+        if ((circleContains(rightCheckingEdge->start, rightCheckingEdge->end,
+                            leftCheckingEdge->start, leftCheckingEdge->end) &&
+                            isLeftEdgeValid) || isRightEdgeValid) {
+            baseEdge = connectEdges(edges, leftCheckingEdge, baseEdge->rev);
+        } else {
+            baseEdge = connectEdges(edges, baseEdge->rev, rightCheckingEdge->rev);
+        }
+    }
+    return std::make_pair(leftEdge.first, rightEdge.second);
 }
 
 std::vector<std::pair<Point, Point>> triangulateDelaunay(const std::vector<Point>& points) {
