@@ -9,6 +9,8 @@
 #include <random>
 #include <Eigen/Dense>
 
+double getWeight(const std::pair<Point, Point>& edge);
+std::vector<double> getWeights(const std::vector<std::pair<Point, Point>>& edges);
 double locate(const std::shared_ptr<Edge>& edge, const Point& point);
 bool isLeft(const std::shared_ptr<Edge>& edge, const Point& point);
 bool isRight(const std::shared_ptr<Edge>& edge, const Point& point);
