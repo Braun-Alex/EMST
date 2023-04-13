@@ -2,9 +2,9 @@
 
 #include "functions.h"
 #include <gtest/gtest.h>
-#include <gmock/gmock-matchers.h>
+#include <gmock/gmock-more-matchers.h>
 
-class DelaunayTriangulationFixture: public testing::TestWithParam<std::pair<std::vector<Point>,
+class DelaunayTriangulationOnTwoPointsFixture: public testing::TestWithParam<std::pair<std::vector<Point>,
         std::vector<std::pair<Point, Point>>>> {
 protected:
     void SetUp() override;
