@@ -1,8 +1,9 @@
 #include "functions.h"
 #include <iostream>
+#include <gtest/gtest.h>
 
 int main() {
-    std::vector<Point> points;
+    /*std::vector<Point> points;
     std::random_device randomDevice;
     std::mt19937 generator(randomDevice());
     std::uniform_int_distribution<int> distribution(-1000000, 1000000);
@@ -18,6 +19,7 @@ int main() {
         std::cout << "First point: (" << firstPoint.x << ", " << firstPoint.y << "), "
                   << "second point: (" << secondPoint.x << ", " << secondPoint.y << "), "
                   << "weight: " << weight << std::endl;
-    }
-    return 0;
+    }*/
+    testing::InitGoogleTest();
+    return RUN_ALL_TESTS();
 }
