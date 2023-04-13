@@ -144,7 +144,7 @@ std::pair<std::shared_ptr<Edge>, std::shared_ptr<Edge>> divideAndConquer(
 std::vector<std::pair<Point, Point>> triangulateDelaunay(const std::vector<Point>& points) {
     size_t size = points.size();
     if (size < 2) {
-        return {};
+        throw std::invalid_argument("The Delaunay triangulation is only valid for two or more points");
     }
     std::vector<Point> uniqueAndSortedPoints = points;
     std::sort(uniqueAndSortedPoints.begin(), uniqueAndSortedPoints.end());
