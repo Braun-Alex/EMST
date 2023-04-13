@@ -1,5 +1,19 @@
 #include "functions.h"
 
+double getWeight(const std::pair<Point, Point>& edge) {
+    return std::sqrt((edge.second.x - edge.first.x) * (edge.second.x - edge.first.x) +
+           (edge.second.y - edge.first.y) * (edge.second.y - edge.first.y));
+}
+
+std::vector<double> getWeights(const std::vector<std::pair<Point, Point>>& edges) {
+    std::vector<double> weights;
+    weights.reserve(edges.size());
+    for (const auto& edge: edges) {
+        weights.push_back(getWeight(edge));
+    }
+    return weights;
+}
+
 double locate(const std::shared_ptr<Edge>& edge, const Point &point) {
     Eigen::Matrix<double, 2, 2> matrix;
     matrix << edge->start.x - point.x, edge->start.y - point.y,
@@ -186,10 +200,7 @@ computeEMST(const std::vector<std::pair<Point, Point>>& edgesWithoutWeight) {
     edgesWithWeight.reserve(edgesWithoutWeight.size());
     for (const auto& edgeWithoutWeight: edgesWithoutWeight) {
         edgesWithWeight.emplace_back(std::make_tuple(edgeWithoutWeight.first, edgeWithoutWeight.second,
-                                  (edgeWithoutWeight.first.x - edgeWithoutWeight.first.y) *
-                                  (edgeWithoutWeight.first.x - edgeWithoutWeight.first.y) +
-                                  (edgeWithoutWeight.second.x - edgeWithoutWeight.second.y) *
-                                  (edgeWithoutWeight.second.x - edgeWithoutWeight.second.y)));
+                                  getWeight(edgeWithoutWeight)));
     }
     std::sort(edgesWithWeight.begin(), edgesWithWeight.end(),
               [](const std::tuple<Point, Point, double>& firstEdgeWithWeight,
