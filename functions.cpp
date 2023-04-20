@@ -37,7 +37,7 @@ bool circleContains(const Point& a, const Point& b, const Point& c, const Point&
                                             (b.y - point.y) * (b.y - point.y),
               c.x - point.x, c.y - point.y, (c.x - point.x) * (c.x - point.x) +
                                             (c.y - point.y) * (c.y - point.y);
-    return matrix.determinant() < 0;
+    return matrix.determinant() >= 0;
 }
 
 std::shared_ptr<Edge> addEdge(std::unordered_set<std::shared_ptr<Edge>>& edges, const Point& startPoint,
@@ -50,7 +50,6 @@ std::shared_ptr<Edge> addEdge(std::unordered_set<std::shared_ptr<Edge>>& edges, 
     forwardEdge->prev = forwardEdge;
     backEdge->next = backEdge;
     backEdge->prev = backEdge;
-    std::unordered_set<std::shared_ptr<Edge>> compilerNotice;
     edges.insert(forwardEdge);
     return forwardEdge;
 }
@@ -78,7 +77,7 @@ std::pair<std::shared_ptr<Edge>, std::shared_ptr<Edge>> divideAndConquer(
     size_t size = points.size();
     if (size == 2) {
         std::shared_ptr<Edge> edge = addEdge(edges, points[0], points[1]);
-        return {edge, edge->rev};
+        return std::make_pair(edge, edge->rev);
     }
     if (size == 3) {
         std::shared_ptr<Edge> firstEdge = addEdge(edges, points[0], points[1]),
@@ -86,35 +85,34 @@ std::pair<std::shared_ptr<Edge>, std::shared_ptr<Edge>> divideAndConquer(
         firstEdge->rev->connect(secondEdge);
         if (isLeft(firstEdge, points[2])) {
             std::shared_ptr<Edge> thirstEdge = connectEdges(edges, secondEdge, firstEdge);
-            return {thirstEdge->rev, thirstEdge};
+            return std::make_pair(thirstEdge->rev, thirstEdge);
         } else if (isRight(firstEdge, points[2])) {
             connectEdges(edges, secondEdge, firstEdge);
-            return {firstEdge, secondEdge->rev};
+            return std::make_pair(firstEdge, secondEdge->rev);
         } else {
-            return {firstEdge, secondEdge->rev};
+            return std::make_pair(firstEdge, secondEdge->rev);
         }
     }
     size_t middle = size/2;
     std::vector<Point> leftPoints(points.begin(), points.begin() + middle),
                        rightPoints(points.begin() + middle, points.end());
-    std::pair<std::shared_ptr<Edge>, std::shared_ptr<Edge>>
-    leftEdge = divideAndConquer(edges, leftPoints),
-    rightEdge = divideAndConquer(edges, rightPoints);
+    auto [leftOutside, leftInside] = divideAndConquer(edges, leftPoints);
+    auto [rightInside, rightOutside] = divideAndConquer(edges, rightPoints);
     while (true) {
-        if (isLeft(rightEdge.first, leftEdge.second->start)) {
-            rightEdge.first = rightEdge.first->rev->prev;
-        } else if (isRight(leftEdge.second, rightEdge.first->start)) {
-            leftEdge.second = leftEdge.second->rev->next;
+        if (isLeft(rightInside, leftInside->start)) {
+            rightInside = rightInside->rev->prev;
+        } else if (isRight(leftInside, rightInside->start)) {
+            leftInside = leftInside->rev->next;
         } else {
             break;
         }
     }
-    std::shared_ptr<Edge> baseEdge = connectEdges(edges, rightEdge.first, leftEdge.first->rev);
-    if (leftEdge.first->start == leftEdge.second->start) {
-        leftEdge.second = baseEdge;
+    std::shared_ptr<Edge> baseEdge = connectEdges(edges, rightInside, leftInside->rev);
+    if (leftInside->start == leftOutside->start) {
+        leftOutside = baseEdge;
     }
-    if (rightEdge.first->start == rightEdge.second->start) {
-        rightEdge.second = baseEdge->rev;
+    if (rightInside->start == rightOutside->start) {
+        rightOutside = baseEdge->rev;
     }
     while (true) {
         std::shared_ptr<Edge> leftCheckingEdge = baseEdge->prev,
@@ -125,7 +123,7 @@ std::pair<std::shared_ptr<Edge>, std::shared_ptr<Edge>> divideAndConquer(
             break;
         }
         if (isLeftEdgeValid) {
-            while (circleContains(baseEdge->start, baseEdge->end,
+            while (circleContains(baseEdge->end, baseEdge->start,
                                   leftCheckingEdge->end,
                                   leftCheckingEdge->prev->end) &&
                                   isRight(baseEdge, leftCheckingEdge->prev->end)) {
@@ -135,7 +133,7 @@ std::pair<std::shared_ptr<Edge>, std::shared_ptr<Edge>> divideAndConquer(
             }
         }
         if (isRightEdgeValid) {
-            while (circleContains(baseEdge->start, baseEdge->end,
+            while (circleContains(baseEdge->end, baseEdge->start,
                                  rightCheckingEdge->end,
                                  rightCheckingEdge->next->end) &&
                                  isRight(baseEdge, rightCheckingEdge->next->end)) {
@@ -144,15 +142,15 @@ std::pair<std::shared_ptr<Edge>, std::shared_ptr<Edge>> divideAndConquer(
                 rightCheckingEdge = temporaryEdge;
             }
         }
-        if ((circleContains(rightCheckingEdge->start, rightCheckingEdge->end,
+        if ((circleContains(rightCheckingEdge->end, rightCheckingEdge->start,
                             leftCheckingEdge->start, leftCheckingEdge->end) &&
-                            isLeftEdgeValid) || isRightEdgeValid) {
+                            isLeftEdgeValid) || !isRightEdgeValid) {
             baseEdge = connectEdges(edges, leftCheckingEdge, baseEdge->rev);
         } else {
             baseEdge = connectEdges(edges, baseEdge->rev, rightCheckingEdge->rev);
         }
     }
-    return std::make_pair(leftEdge.first, rightEdge.second);
+    return std::make_pair(leftOutside, rightOutside);
 }
 
 std::vector<std::pair<Point, Point>> triangulateDelaunay(const std::vector<Point>& points) {
@@ -163,7 +161,7 @@ std::vector<std::pair<Point, Point>> triangulateDelaunay(const std::vector<Point
                                 uniqueAndSortedPoints.end());
     size_t size = uniqueAndSortedPoints.size();
     if (size < 2) {
-        return {};
+        throw std::invalid_argument("Count of points must be greater or equal than two points");
     }
     std::unordered_set<std::shared_ptr<Edge>> edges;
     divideAndConquer(edges, points);

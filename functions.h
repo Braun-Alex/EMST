@@ -6,7 +6,6 @@
 #include <vector>
 #include <unordered_set>
 #include <algorithm>
-#include <random>
 #include <Eigen/Dense>
 
 double getWeight(const std::pair<Point, Point>& edge);
