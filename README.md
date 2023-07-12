@@ -1,4 +1,4 @@
-# Euclidean minumum spanning tree
+# Euclidean minimum spanning tree
 
 The project contains the implementation of the algorithm for constructing the Euclidean minimum spanning tree in optimal time 
 ![O(Nlog₂N)](https://latex.codecogs.com/svg.latex?O%28N%5Clog_2%20N%29) by sequentially applying the Delaunay triangulation 
